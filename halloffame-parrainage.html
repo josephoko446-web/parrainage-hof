@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Hall of Fame — Parrainage</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#f1f5f9;min-height:100vh}
+  /* NAV */
+  nav{background:#0f172a;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+  .logo{background:#f59e0b;color:#0f172a;font-weight:900;font-size:15px;padding:6px 10px;border-radius:8px;letter-spacing:1px}
+  .nav-title{color:#f8fafc;font-weight:700;font-size:16px}
+  .nav-sub{color:#94a3b8;font-size:11px}
+  /* PAGES */
+  .page{display:none;padding:18px}
+  .page.active{display:block}
+  /* STATS */
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:18px}
+  .stat{background:#fff;border-radius:12px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  .stat-icon{font-size:22px}
+  .stat-val{font-size:26px;font-weight:800;margin:4px 0}
+  .stat-lbl{color:#64748b;font-size:11px}
+  /* CARDS */
+  .cards{display:flex;flex-direction:column;gap:14px}
+  .card{background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.09);overflow:hidden}
+  .card-head{display:flex;align-items:center;gap:10px;padding:13px 14px;border-bottom:1px solid #f1f5f9}
+  .avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;flex-shrink:0}
+  .card-name{font-weight:700;color:#1e293b;font-size:14px}
+  .card-slug{color:#94a3b8;font-size:11px;margin-top:2px}
+  .count-badge{background:#fef3c7;color:#92400e;font-weight:800;font-size:18px;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:auto}
+  .card-link{display:flex;align-items:center;gap:6px;padding:8px 12px;background:#f8fafc;border-bottom:1px solid #f1f5f9;flex-wrap:wrap}
+  .link-text{font-size:10px;color:#6366f1;font-family:monospace;flex:1;word-break:break-all}
+  .btn-mini{border:none;cursor:pointer;border-radius:6px;padding:4px 9px;font-size:12px;background:#e0e7ff;color:#3730a3;font-weight:600}
+  .btn-mini.green{background:#dcfce7;color:#15803d}
+  .filleul-list{padding:10px 12px;max-height:200px;overflow-y:auto}
+  .filleul-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #f8fafc}
+  .filleul-num{font-weight:600;color:#1e293b;font-size:13px}
+  .filleul-time{color:#94a3b8;font-size:11px}
+  .empty-note{color:#cbd5e1;font-size:12px;text-align:center;padding:14px 0}
+  /* BUTTONS */
+  .btn{border:none;border-radius:8px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;width:100%}
+  .btn-gold{background:#f59e0b;color:#0f172a}
+  .btn-outline{background:transparent;color:#f8fafc;border:1.5px solid #334155;border-radius:8px;padding:8px 14px;font-weight:600;font-size:13px;cursor:pointer}
+  .btn-sm{width:auto;padding:9px 14px;font-size:13px}
+  /* INPUTS */
+  input,select{border:1.5px solid #e2e8f0;border-radius:8px;padding:11px 13px;font-size:14px;outline:none;color:#1e293b;background:#fff;width:100%}
+  .err{color:#ef4444;font-size:12px;margin-top:4px}
+  /* ADMIN TABLE (scroll) */
+  .admin-list{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+  .admin-row{background:#f8fafc;border-radius:10px;padding:12px}
+  .admin-row-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .admin-row-name{font-weight:700;color:#1e293b;font-size:14px}
+  .admin-row-link{font-size:10px;color:#6366f1;font-family:monospace;word-break:break-all;margin-bottom:8px}
+  .admin-row-actions{display:flex;gap:8px}
+  .btn-copy{padding:6px 12px;border:none;border-radius:6px;background:#e0e7ff;color:#3730a3;cursor:pointer;font-size:12px;font-weight:600}
+  .btn-del{padding:6px 10px;border:none;border-radius:6px;background:#fee2e2;color:#b91c1c;cursor:pointer;font-size:13px}
+  /* LANDING */
+  #landing-page{display:none;min-height:100vh;background:linear-gradient(135deg,#0f172a,#1e1b4b);align-items:center;justify-content:center;padding:20px}
+  #landing-page.active{display:flex}
+  .landing-card{background:#fff;border-radius:20px;padding:32px 24px;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+  .logo-mark{background:#f59e0b;color:#0f172a;font-weight:900;font-size:20px;width:52px;height:52px;border-radius:13px;display:inline-flex;align-items:center;justify-content:center;letter-spacing:1px;margin-bottom:12px}
+  .landing-title{font-weight:900;font-size:22px;color:#0f172a;margin-bottom:4px}
+  .landing-sub{color:#94a3b8;margin-bottom:18px;font-size:13px}
+  .ref-badge{display:inline-block;background:#eef2ff;color:#4f46e5;border-radius:20px;padding:6px 16px;font-size:13px;margin-bottom:14px}
+  .landing-desc{color:#64748b;font-size:13px;margin-bottom:22px;line-height:1.6}
+  .success-box{padding:20px 0;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .success-icon{font-size:50px}
+  .success-text{font-weight:800;font-size:20px;color:#10b981}
+  .success-meta{color:#64748b;font-size:13px;line-height:1.6}
+  .back-link{background:none;border:none;color:#94a3b8;cursor:pointer;margin-top:18px;font-size:13px}
+  /* SECTION TITLES */
+  .section-title{font-weight:700;color:#1e293b;font-size:15px;margin-bottom:14px}
+  .white-box{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:16px}
+  /* TABS */
+  .tabs{display:flex;gap:8px;margin-bottom:18px}
+  .tab{flex:1;padding:10px;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;background:#e2e8f0;color:#64748b}
+  .tab.active{background:#0f172a;color:#f59e0b}
+  /* SEARCH */
+  .search-wrap{margin-bottom:14px}
+  /* SIMUL */
+  .simul-box{background:#eef2ff;border-radius:10px;padding:14px;border:1px solid #c7d2fe;margin-bottom:16px}
+  .simul-title{font-weight:700;color:#6366f1;font-size:13px;margin-bottom:10px}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .flex-1{flex:1;min-width:120px}
+  /* TOAST */
+  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+  #toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- LANDING PAGE -->
+<div id="landing-page">
+  <div class="landing-card">
+    <div class="logo-mark">HOF</div>
+    <div class="landing-title">HALL OF FAME</div>
+    <div class="landing-sub">Cotonou, Bénin</div>
+    <div id="landing-badge" class="ref-badge"></div>
+    <div class="landing-desc">Entrez votre numéro WhatsApp pour rejoindre la communauté Hall of Fame et bénéficier d'offres exclusives.</div>
+    <div id="landing-form">
+      <input type="tel" id="landing-input" placeholder="+229 97 00 00 00" style="margin-bottom:10px"/>
+      <p id="landing-err" class="err" style="display:none"></p>
+      <button class="btn btn-gold" onclick="submitLanding()">VALIDER</button>
+    </div>
+    <div id="landing-success" class="success-box" style="display:none">
+      <div class="success-icon">🎉</div>
+      <div class="success-text">Inscription réussie !</div>
+      <div class="success-meta" id="success-meta"></div>
+    </div>
+    <button class="back-link" onclick="closeLanding()">← Retour à l'admin</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="main-app">
+  <nav>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="logo">HOF</span>
+      <div>
+        <div class="nav-title">Parrainage</div>
+        <div class="nav-sub">Hall of Fame · Cotonou</div>
+      </div>
+    </div>
+    <button class="btn-outline" onclick="showPage('admin')">⚙️ Parrains</button>
+  </nav>
+
+  <!-- DASHBOARD -->
+  <div id="page-dashboard" class="page active" style="padding-top:16px">
+    <div class="stats" id="stats-grid"></div>
+    <div class="search-wrap">
+      <input type="text" id="search-input" placeholder="🔍 Rechercher un parrain..." oninput="renderCards()"/>
+    </div>
+    <div class="simul-box">
+      <div class="simul-title">🧪 Simuler un filleul (démo)</div>
+      <div class="row" style="margin-bottom:8px">
+        <select id="simul-select" class="flex-1">
+          <option value="">— Choisir parrain —</option>
+        </select>
+        <input type="tel" id="simul-num" placeholder="+22997000000" class="flex-1"/>
+      </div>
+      <button class="btn btn-gold btn-sm" onclick="simulateClick()">Simuler</button>
+      <p id="simul-err" class="err" style="display:none"></p>
+    </div>
+    <div class="cards" id="cards-container"></div>
+  </div>
+
+  <!-- ADMIN -->
+  <div id="page-admin" class="page" style="padding-top:16px">
+    <button class="btn-outline" style="margin-bottom:14px" onclick="showPage('dashboard')">← Dashboard</button>
+    <div class="white-box">
+      <div class="section-title">➕ Ajouter un parrain</div>
+      <input type="text" id="add-name" placeholder="Nom du parrain (ex: Jean Kofi)" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')addParrain()"/>
+      <p id="add-err" class="err" style="display:none"></p>
+      <button class="btn btn-gold" onclick="addParrain()" style="margin-top:6px">Créer le lien</button>
+    </div>
+    <div class="white-box">
+      <div class="section-title" id="admin-count">👥 Parrains actifs</div>
+      <div class="admin-list" id="admin-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DB ───────────────────────────────────────────────────────────────────
+const BASE_URL = "https://halloffame.bj/ref";
+
+function loadDB(){
+  try{
+    const p=localStorage.getItem('hof_parrains');
+    const f=localStorage.getItem('hof_filleuls');
+    return {
+      parrains: p?JSON.parse(p):[],
+      filleuls: f?JSON.parse(f):[]
+    };
+  }catch(e){return{parrains:[],filleuls:[]};}
+}
+
+function saveDB(db){
+  localStorage.setItem('hof_parrains',JSON.stringify(db.parrains));
+  localStorage.setItem('hof_filleuls',JSON.stringify(db.filleuls));
+}
+
+let DB = loadDB();
+
+// Seed demo si vide
+if(DB.parrains.length===0){
+  const now=new Date().toISOString();
+  DB.parrains=[
+    {id:uid(),nom:"Marie Dupont",slug:"marie-dupont",createdAt:now},
+    {id:uid(),nom:"Jean Kofi",slug:"jean-kofi",createdAt:now},
+    {id:uid(),nom:"Paul Ahounou",slug:"paul-ahounou",createdAt:now},
+  ];
+  DB.filleuls=[
+    {id:uid(),parrainSlug:"marie-dupont",numero:"+22997112233",timestamp:new Date(Date.now()-3600000).toISOString()},
+    {id:uid(),parrainSlug:"marie-dupont",numero:"+33612345678",timestamp:new Date(Date.now()-1800000).toISOString()},
+    {id:uid(),parrainSlug:"jean-kofi",numero:"+22996778899",timestamp:new Date(Date.now()-900000).toISOString()},
+  ];
+  saveDB(DB);
+}
+
+// ─── UTILS ────────────────────────────────────────────────────────────────
+function uid(){return Math.random().toString(36).slice(2,9)}
+function slugify(n){return n.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g,"-").replace(/[^a-z0-9-]/g,"")}
+function fmtTime(iso){const d=new Date(iso);return d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}
+function fmtDate(iso){const d=new Date(iso);return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// ─── NAVIGATION ───────────────────────────────────────────────────────────
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(name==='dashboard') renderAll();
+  if(name==='admin') renderAdmin();
+}
+
+// ─── RENDER DASHBOARD ─────────────────────────────────────────────────────
+function renderAll(){
+  renderStats();
+  renderCards();
+  renderSimulSelect();
+}
+
+function renderStats(){
+  const total=DB.filleuls.length;
+  const today=DB.filleuls.filter(f=>new Date(f.timestamp).toDateString()===new Date().toDateString()).length;
+  let best='—';
+  if(DB.parrains.length>0){
+    const b=DB.parrains.reduce((bst,p)=>{
+      const c=DB.filleuls.filter(f=>f.parrainSlug===p.slug).length;
+      const bc=DB.filleuls.filter(f=>f.parrainSlug===bst.slug).length;
+      return c>bc?p:bst;
+    },DB.parrains[0]);
+    best=b.nom.split(' ')[0];
+  }
+  document.getElementById('stats-grid').innerHTML=`
+    <div class="stat" style="border-top:3px solid #6366f1">
+      <div class="stat-icon">👥</div>
+      <div class="stat-val" style="color:#6366f1">${DB.parrains.length}</div>
+      <div class="stat-lbl">Parrains actifs</div>
+    </div>
+    <div class="stat" style="border-top:3px solid #f59e0b">
+      <div class="stat-icon">🎯</div>
+      <div class="stat-val" style="color:#f59e0b">${total}</div>
+      <div class="stat-lbl">Total filleuls</div>
+    </div>
+    <div class="stat" style="border-top:3px solid #10b981">
+      <div class="stat-icon">🏆</div>
+      <div class="stat-val" style="color:#10b981;font-size:16px">${best}</div>
+      <div class="stat-lbl">Meilleur parrain</div>
+    </div>
+    <div class="stat" style="border-top:3px solid #ec4899">
+      <div class="stat-icon">📅</div>
+      <div class="stat-val" style="color:#ec4899">${today}</div>
+      <div class="stat-lbl">Aujourd'hui</div>
+    </div>
+  `;
+}
+
+function renderCards(){
+  const q=(document.getElementById('search-input').value||'').toLowerCase();
+  const filtered=DB.parrains.filter(p=>p.nom.toLowerCase().includes(q));
+  const c=document.getElementById('cards-container');
+  if(filtered.length===0){
+    c.innerHTML=`<div style="text-align:center;padding:50px 0;color:#94a3b8">
+      ${DB.parrains.length===0?'<p style="font-size:36px">📭</p><p>Aucun parrain. Allez dans ⚙️ Parrains.</p>':'<p>Aucun résultat.</p>'}
+    </div>`;return;
+  }
+  c.innerHTML=filtered.map(p=>{
+    const filleuls=DB.filleuls.filter(f=>f.parrainSlug===p.slug)
+      .sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+    const link=`${BASE_URL}?id=${p.slug}`;
+    const rows=filleuls.length===0
+      ?`<div class="empty-note">Aucun filleul pour l'instant.</div>`
+      :filleuls.map(f=>`
+        <div class="filleul-row">
+          <span class="filleul-num">${f.numero}</span>
+          <span class="filleul-time">${fmtDate(f.timestamp)} · ${fmtTime(f.timestamp)}</span>
+        </div>`).join('');
+    return `
+      <div class="card">
+        <div class="card-head">
+          <div class="avatar">${p.nom[0].toUpperCase()}</div>
+          <div style="flex:1">
+            <div class="card-name">${p.nom}</div>
+            <div class="card-slug">/${p.slug}</div>
+          </div>
+          <div class="count-badge">${filleuls.length}</div>
+        </div>
+        <div class="card-link">
+          <span class="link-text">${link}</span>
+          <button class="btn-mini" onclick="copyLink('${link}')">📋</button>
+          <button class="btn-mini green" onclick="openLanding('${p.slug}')">👁</button>
+        </div>
+        <div class="filleul-list">${rows}</div>
+      </div>`;
+  }).join('');
+}
+
+function renderSimulSelect(){
+  const s=document.getElementById('simul-select');
+  s.innerHTML=`<option value="">— Choisir parrain —</option>`+
+    DB.parrains.map(p=>`<option value="${p.slug}">${p.nom}</option>`).join('');
+}
+
+// ─── RENDER ADMIN ─────────────────────────────────────────────────────────
+function renderAdmin(){
+  document.getElementById('admin-count').textContent=`👥 Parrains actifs (${DB.parrains.length})`;
+  const list=document.getElementById('admin-list');
+  if(DB.parrains.length===0){
+    list.innerHTML=`<div class="empty-note">Aucun parrain pour l'instant.</div>`;return;
+  }
+  list.innerHTML=DB.parrains.map(p=>{
+    const count=DB.filleuls.filter(f=>f.parrainSlug===p.slug).length;
+    const link=`${BASE_URL}?id=${p.slug}`;
+    return `
+      <div class="admin-row">
+        <div class="admin-row-top">
+          <span class="admin-row-name">${p.nom}</span>
+          <span style="background:#fef3c7;color:#92400e;font-weight:700;padding:2px 10px;border-radius:20px;font-size:13px">${count} filleul${count>1?'s':''}</span>
+        </div>
+        <div class="admin-row-link">${link}</div>
+        <div class="admin-row-actions">
+          <button class="btn-copy" onclick="copyLink('${link}')">📋 Copier le lien</button>
+          <button class="btn-copy" style="background:#dcfce7;color:#15803d" onclick="openLanding('${p.slug}')">👁 Voir</button>
+          <button class="btn-del" onclick="deleteParrain('${p.slug}')">🗑</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ─── ACTIONS ──────────────────────────────────────────────────────────────
+function addParrain(){
+  const inp=document.getElementById('add-name');
+  const err=document.getElementById('add-err');
+  const nom=inp.value.trim();
+  if(!nom){err.textContent="Entrez un nom.";err.style.display='block';return;}
+  const slug=slugify(nom);
+  if(DB.parrains.find(p=>p.slug===slug)){
+    err.textContent="Ce parrain existe déjà.";err.style.display='block';return;
+  }
+  DB.parrains.push({id:uid(),nom,slug,createdAt:new Date().toISOString()});
+  saveDB(DB);
+  inp.value='';err.style.display='none';
+  renderAdmin();
+  toast(`✅ ${nom} ajouté !`);
+}
+
+function deleteParrain(slug){
+  if(!confirm("Supprimer ce parrain et tous ses filleuls ?")) return;
+  DB.parrains=DB.parrains.filter(p=>p.slug!==slug);
+  DB.filleuls=DB.filleuls.filter(f=>f.parrainSlug!==slug);
+  saveDB(DB);
+  renderAdmin();
+  toast("🗑 Parrain supprimé");
+}
+
+function copyLink(link){
+  navigator.clipboard.writeText(link).then(()=>toast("📋 Lien copié !")).catch(()=>{
+    // fallback
+    const ta=document.createElement('textarea');
+    ta.value=link;document.body.appendChild(ta);ta.select();
+    document.execCommand('copy');document.body.removeChild(ta);
+    toast("📋 Lien copié !");
+  });
+}
+
+function simulateClick(){
+  const slug=document.getElementById('simul-select').value;
+  const num=document.getElementById('simul-num').value.replace(/\s/g,'');
+  const err=document.getElementById('simul-err');
+  if(!slug){err.textContent="Choisissez un parrain.";err.style.display='block';return;}
+  if(!/^\+?[0-9]{8,15}$/.test(num)){err.textContent="Numéro invalide. Ex: +22997000000";err.style.display='block';return;}
+  DB.filleuls.push({id:uid(),parrainSlug:slug,numero:num,timestamp:new Date().toISOString()});
+  saveDB(DB);
+  document.getElementById('simul-num').value='';
+  err.style.display='none';
+  renderAll();
+  toast("✅ Filleul simulé !");
+}
+
+// ─── LANDING ──────────────────────────────────────────────────────────────
+let currentLandingSlug=null;
+
+function openLanding(slug){
+  const p=DB.parrains.find(x=>x.slug===slug);
+  if(!p) return;
+  currentLandingSlug=slug;
+  document.getElementById('landing-badge').textContent=`Invité par ${p.nom}`;
+  document.getElementById('landing-input').value='';
+  document.getElementById('landing-err').style.display='none';
+  document.getElementById('landing-form').style.display='block';
+  document.getElementById('landing-success').style.display='none';
+  document.getElementById('main-app').style.display='none';
+  document.getElementById('landing-page').classList.add('active');
+}
+
+function closeLanding(){
+  document.getElementById('landing-page').classList.remove('active');
+  document.getElementById('main-app').style.display='block';
+  renderAll();
+}
+
+function submitLanding(){
+  const num=document.getElementById('landing-input').value.replace(/\s/g,'');
+  const err=document.getElementById('landing-err');
+  if(!/^\+?[0-9]{8,15}$/.test(num)){
+    err.textContent="Numéro invalide. Ex: +22997000000";err.style.display='block';return;
+  }
+  DB.filleuls.push({id:uid(),parrainSlug:currentLandingSlug,numero:num,timestamp:new Date().toISOString()});
+  saveDB(DB);
+  const p=DB.parrains.find(x=>x.slug===currentLandingSlug);
+  document.getElementById('success-meta').innerHTML=`Vous avez été parrainé par <strong>${p?.nom||''}</strong>.<br>Notre équipe vous contactera bientôt.`;
+  document.getElementById('landing-form').style.display='none';
+  document.getElementById('landing-success').style.display='flex';
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────
+renderAll();
+</script>
+</body>
+</html>
